@@ -21,7 +21,4 @@ public class HttpHeaders {
     public int bodyStartIndex = 0;
     public int bodyEndIndex   = 0;
 
-
-
-
 }

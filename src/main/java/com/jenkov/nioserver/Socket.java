@@ -32,6 +32,7 @@ public class Socket {
             bytesRead = this.socketChannel.read(byteBuffer);
             totalBytesRead += bytesRead;
         }
+
         if(bytesRead == -1){
             this.endOfStreamReached = true;
         }
@@ -40,7 +41,7 @@ public class Socket {
     }
 
     public int write(ByteBuffer byteBuffer) throws IOException{
-        int bytesWritten      = this.socketChannel.write(byteBuffer);
+        int bytesWritten = this.socketChannel.write(byteBuffer);
         int totalBytesWritten = bytesWritten;
 
         while(bytesWritten > 0 && byteBuffer.hasRemaining()){

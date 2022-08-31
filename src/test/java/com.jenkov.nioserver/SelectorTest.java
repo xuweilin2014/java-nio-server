@@ -27,9 +27,6 @@ public class SelectorTest {
 
         SelectionKey key2 = socketChannel.register(selector, SelectionKey.OP_WRITE);
         key2.cancel();
-
-
-
     }
 
 

@@ -8,9 +8,9 @@ import java.util.Queue;
 public class WriteProxy {
 
     private MessageBuffer messageBuffer = null;
-    private Queue        writeQueue     = null;
+    private Queue<Message> writeQueue = null;
 
-    public WriteProxy(MessageBuffer messageBuffer, Queue writeQueue) {
+    public WriteProxy(MessageBuffer messageBuffer, Queue<Message> writeQueue) {
         this.messageBuffer = messageBuffer;
         this.writeQueue = writeQueue;
     }
