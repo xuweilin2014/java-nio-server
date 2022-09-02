@@ -26,7 +26,7 @@ public class Main {
             System.out.println("Message Received from socket: " + request.socketId);
             Message response = writeProxy.getMessage();
             response.socketId = request.socketId;
-            // 将上面 httpResponseBytes 字节数组中的内容写入到 response 中
+            // 将上面 httpResponseBytes 字节数组中的内容写入到响应消息 response 中
             response.writeToMessage(httpResponseBytes);
             // 将 response 保存到 writeProxy 中的队列中
             writeProxy.enqueue(response);

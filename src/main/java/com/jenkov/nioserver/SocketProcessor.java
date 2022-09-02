@@ -39,9 +39,16 @@ public class SocketProcessor implements Runnable {
     public SocketProcessor(Queue<Socket> inboundSocketQueue, MessageBuffer readMessageBuffer, MessageBuffer writeMessageBuffer, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) throws IOException {
         // inboundSocketQueue 队列中保存了客户端连接
         this.inboundSocketQueue = inboundSocketQueue;
+
+        // readMessageBuffer 和 writeMessageBuffer 在整个 Server 中唯一
         this.readMessageBuffer = readMessageBuffer;
         this.writeMessageBuffer = writeMessageBuffer;
+
+        // writeProxy 可以把请求消息 request 处理之后，再保存到 writeProxy 中的 outboundMessageQueue 队列里面，
+        // 之后 SocketProcessor 会从 outboundMessageQueue 中读取出响应消息 message，获取对应的 socket 连接，
+        // 再通过 messageWriter 把 message 消息通过 socket 返回给客户端
         this.writeProxy = new WriteProxy(writeMessageBuffer, this.outboundMessageQueue);
+
         // messageReaderFactory 用来生成各种消息解码器，不过这里只提供 HttpReader
         this.messageReaderFactory = messageReaderFactory;
         this.messageProcessor = messageProcessor;
@@ -131,7 +138,10 @@ public class SocketProcessor implements Runnable {
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
                 message.socketId = socket.socketId;
-                this.messageProcessor.process(message, this.writeProxy);  //the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
+                // messageProcessor 处理请求消息，然后将得到的响应 response message 保存到 outboundMessageQueue
+                // 队列中，后面会依次取出返回给客户端响应
+                // the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
+                this.messageProcessor.process(message, this.writeProxy);
             }
             fullMessages.clear();
         }
@@ -207,7 +217,7 @@ public class SocketProcessor implements Runnable {
 
             if(socket != null){
                 MessageWriter messageWriter = socket.messageWriter;
-                // 如果 messageWriter 为空，就把响应消息保存到 messageWriter 中的队列中
+                // 如果 messageWriter 为空，就把响应消息保存到 messageWriter 的队列中
                 // 同时，如果此 socket 有响应消息要被发送，就可以将其注册到 write selector 上，一旦此 socket 可以写数据，
                 // 那么就把响应消息发送到客户端
                 if(messageWriter.isEmpty()){

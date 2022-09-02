@@ -21,9 +21,8 @@ public class MessageTest {
     public void testWriteToMessage() {
         MessageBuffer messageBuffer = new MessageBuffer();
 
-        Message    message    = messageBuffer.getMessage();
+        Message message = messageBuffer.getMessage();
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024 * 1024);
-
         fill(byteBuffer, 4096);
 
         int written = message.writeToMessage(byteBuffer);

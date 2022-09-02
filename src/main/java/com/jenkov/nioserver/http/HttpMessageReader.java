@@ -18,9 +18,9 @@ public class HttpMessageReader implements IMessageReader {
     private MessageBuffer messageBuffer = null;
     // completeMessages 表示单个 HTTP 消息的集合
     private List<Message> completeMessages = new ArrayList<Message>();
-    // nextMessage 表示从 socket 中读取到的 HTTP 消息，这些 HTTP 消息不一定是完整的
-    // 比如有可能是 2.3 个 HTTP 消息，或者 0.4 个 HTTP 消息，但是 nextMessage 类似于
-    // 一个缓冲区，不断从客户端接收字节数据，当形成一个完整的 HTTP 消息时，就把这个消息保存到 completeMessages 数组中
+    // nextMessage 类似于一个缓冲区，不断从客户端接收 HTTP 字节数据，但是这些 HTTP 消息不一定是完整的
+    // 比如有可能是 2.3 个 HTTP 消息，或者 0.4 个 HTTP 消息当形成一个完整的 HTTP 消息时，就把这个消息
+    // 保存到 completeMessages 数组中
     private Message nextMessage = null;
 
     public HttpMessageReader() {

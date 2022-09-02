@@ -70,6 +70,8 @@ public class HttpUtil {
         int bodyStartIndex = endOfHeader + 1;
         int bodyEndIndex  = bodyStartIndex + httpHeaders.contentLength;
 
+        // endIndex 是发送过来的消息字节的结束 index，而 bodyEndIndex 是消息中第一个 HTTP 消息体的结束 index
+        // 由于 src 中可能包含多个 HTTP 消息，因此 bodyEndIndex < endIndex
         if(bodyEndIndex <= endIndex){
             // byte array contains a full HTTP request
             httpHeaders.bodyStartIndex = bodyStartIndex;

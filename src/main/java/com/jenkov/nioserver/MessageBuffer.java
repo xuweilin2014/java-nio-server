@@ -9,6 +9,10 @@ package com.jenkov.nioserver;
  * 层次，分别表示 4KB、128KB、1MB 大小。给 small 类的消息分配了 1024 个 section，给 medium 类的消息分配了 128 个 section，
  * 给 large 类的消息分配了 16 个 section。
  *
+ * 在分配具体的消息块时，都是先分配一个 small 类型的 section 块，当接收到的消息字节数超过 CAPACITY_SMALL 时，就会分配一个新的
+ * medium 类型的 section 块，然后将 small section 中的内容保存到 medium section 中，如果字节数超过 CAPACITY_MEDIUM 时，就
+ * 会分配 large section 块，如果再超过，直接返回 false。
+ *
  * 在分配每一类的 section 时，需要对已经分配出去的内存块进行记录。这里使用的是 QueueIntFlip 类来保存已经分配出去的 section 的起始
  * 地址。QueueIntFlip 内部有一个 int 数组 elements 来进行记录，这个 QueueIntFlip 使用类似于生产者消费者的模式。在其初始化时，就
  * 会填充满所有 section 的地址，当有 message 到达需要分配一个 section 进行存储时，就会从 QueueIntFlip 中 take 一个 freeBlock
@@ -47,15 +51,19 @@ public class MessageBuffer {
         }
     }
 
+    // 分配字节数组，创建一个 Message 对象，分配时，先从 small 类型的内存开始
     public Message getMessage() {
+        // 获取 small section 的内存地址，即 small section 位于 smallMessageBuffer 数组上的位置
         int nextFreeSmallBlock = this.smallMessageBufferFreeBlocks.take();
 
         if(nextFreeSmallBlock == -1) return null;
 
         Message message = new Message(this);
-
+        // sharedArray 指向 smallMessageBuffer 数组，分配在这个数组上进行
         message.sharedArray = this.smallMessageBuffer;
+        // capacity 表示分配的空间大小
         message.capacity    = CAPACITY_SMALL;
+        // offset 表示消息被分配的起始位置
         message.offset      = nextFreeSmallBlock;
         message.length      = 0;
 
